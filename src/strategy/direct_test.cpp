@@ -7,7 +7,8 @@
 
 TEST(Direct, AllocateDeallocate)
 {
-  using Strategy = memo::strategy::Direct<memo::resource::Host>;
+  using Resource = memo::resource::Host;
+  using Strategy = memo::strategy::Direct<Resource>;
 
   constexpr int n = 1024;
 

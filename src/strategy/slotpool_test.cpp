@@ -7,7 +7,8 @@
 
 TEST(Slotpool, AllocateDeallocate)
 {
-  using Strategy = memo::strategy::Slotpool<memo::resource::Host>;
+  using Resource = memo::resource::Host;
+  using Strategy = memo::strategy::Slotpool<Resource>;
 
   constexpr int n = 1024;
 

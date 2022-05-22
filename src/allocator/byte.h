@@ -17,10 +17,22 @@ class Byte
 {
 public:
   Byte() :
-    strategy_{ std::make_shared<Strategy>() }
+      strategy_{ std::make_shared<Strategy>() }
   {}
 
-  Byte(const Byte& other) {}
+  Byte(const Byte& other) :
+      strategy_{ other.strategy_ }
+  {}
+
+  bool operator==(const Byte& other)
+  {
+    return strategy_ == other.strategy_;
+  }
+
+  bool operator!=(const Byte& other)
+  {
+    return !(*this == other);
+  }
 
   void* allocate(std::size_t n)
   {
@@ -33,14 +45,14 @@ public:
     strategy_->deallocate(p, n);
   }
 
-  bool operator==(const Byte& other)
+  void shrink_to_fit()
   {
-    return strategy_ == other.strategy_;
+    strategy_->shrink_to_fit();
   }
 
-  bool operator!=(const Byte& other)
+  void release()
   {
-    return !(*this == other);
+    strategy_->release();
   }
 
 private:

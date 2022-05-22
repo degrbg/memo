@@ -35,6 +35,18 @@ public:
       strategy_{ other.strategy_ }
   {}
 
+  template <typename U>
+  bool operator==(const Type<U, Strategy>& other)
+  {
+    return strategy_ == other.strategy_;
+  }
+
+  template <typename U>
+  bool operator!=(const Type<U, Strategy>& other)
+  {
+    return !(*this == other);
+  }
+
   T* allocate(std::size_t n)
   {
     auto p = strategy_->allocate(ts_ * n);
@@ -48,16 +60,14 @@ public:
     strategy_->deallocate(p, ts_ * n);
   }
 
-  template <typename U>
-  bool operator==(const Type<U, Strategy>& other)
+  void shrink_to_fit()
   {
-    return strategy_ == other.strategy_;
+    strategy_->shrink_to_fit();
   }
 
-  template <typename U>
-  bool operator!=(const Type<U, Strategy>& other)
+  void release()
   {
-    return !(*this == other);
+    strategy_->release();
   }
 
 private:
