@@ -35,12 +35,49 @@ public:
 
   virtual void shrink_to_fit() = 0;
 
-  virtual void release() = 0;
+  void release()
+  {
+    s_counter_.size_ = 0;
+    s_counter_.count_ = 0;
+    strategy_release();
+  }
+
+  std::size_t strategy_size() const
+  {
+    return s_counter_.size_;
+  }
+
+  std::size_t strategy_size_max() const
+  {
+    return s_counter_.size_max_;
+  }
+
+  std::size_t strategy_count() const
+  {
+    return s_counter_.count_;
+  }
+
+  std::size_t resource_size() const
+  {
+    return r_counter_.size_;
+  }
+
+  std::size_t resource_size_max() const
+  {
+    return r_counter_.size_max_;
+  }
+
+  std::size_t resource_count() const
+  {
+    return r_counter_.count_;
+  }
 
 protected:
   virtual void* strategy_allocate(std::size_t n) = 0;
 
   virtual void strategy_deallocate(void* p, std::size_t n) = 0;
+
+  virtual void strategy_release() = 0;
 
   void* resource_allocate(std::size_t n)
   {

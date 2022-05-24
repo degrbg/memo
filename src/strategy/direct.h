@@ -15,8 +15,6 @@ public:
 
   void shrink_to_fit() override {}
 
-  void release() override {}
-
 protected:
   void* strategy_allocate(std::size_t n) override
   {
@@ -27,6 +25,8 @@ protected:
   {
     this->resource_deallocate(p, n);
   }
+
+  void strategy_release() override {}
 };
 
 }

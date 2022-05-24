@@ -16,9 +16,7 @@ public:
 
   ~Slotpool()
   {
-    for (auto& slot : slots_) {
-      this->resource_deallocate(slot.p_, slot.size_);
-    }
+    this->release();
   }
 
   void shrink_to_fit() override
@@ -28,22 +26,11 @@ public:
       if (slot.used_) {
         new_slots.emplace_back(slot);
       }
-      else if (slot.p_) {
+      else {
         this->resource_deallocate(slot.p_, slot.size_);
       }
     }
     slots_ = std::move(new_slots);
-  }
-
-  void release() override
-  {
-    for (const auto& slot : slots_) {
-      if (slot.p_) {
-        this->resource_deallocate(slot.p_, slot.size_);
-      }
-    }
-    slots_.clear();
-    slots_.shrink_to_fit();
   }
 
 protected:
@@ -61,21 +48,7 @@ protected:
 
     if (!p) {
       p = this->resource_allocate(n);
-
-      Slot new_slot{ n, true, p };
-      bool found_empty_slot = false;
-
-      for (auto& slot : slots_) {
-        if (slot.p_ == nullptr) {
-          slot = new_slot;
-          found_empty_slot = true;
-          break;
-        }
-      }
-
-      if (!found_empty_slot) {
-        slots_.emplace_back(new_slot);
-      }
+      slots_.emplace_back(n, true, p);
     }
 
     return p;
@@ -91,12 +64,26 @@ protected:
     }
   }
 
+  void strategy_release() override
+  {
+    for (const auto& slot : slots_) {
+      this->resource_deallocate(slot.p_, slot.size_);
+    }
+    slots_.clear();
+    slots_.shrink_to_fit();
+  }
+
 private:
   struct Slot
   {
-    std::size_t size_;
+    Slot(std::size_t size, bool used, void* p) :
+        size_{ size },
+        used_{ used },
+        p_{ p }
+    {}
+    const std::size_t size_;
     bool used_;
-    void* p_;
+    void* const p_;
   };
 
   std::vector<Slot> slots_;
